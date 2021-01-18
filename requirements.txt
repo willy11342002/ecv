@@ -1,0 +1,4 @@
+Django==3.0.8
+requests==2.24.0
+django_allauth==0.42.0
+PyMySQL==0.10.0
