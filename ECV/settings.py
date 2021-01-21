@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 擴充套件
     'django_extensions',
+    # 專案
+    'apiV1',
 ]
 
 MIDDLEWARE = [
