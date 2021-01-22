@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views import View
+from collections import Counter
 from itertools import groupby
 from . import models
 import datetime
@@ -14,9 +15,9 @@ class SummaryItem(View):
         items = items.select_related('product')
         items = items.filter(UsageAccountId=usageaccountid)
         items = items.values('product__ProductName')
-        items = items.annotate(Sum('UsageAmount'))
+        items = items.annotate(Sum('UnblendedCost'))
         items = {
-            item['product__ProductName']: f"{item['UsageAmount__sum']:.2f}"
+            item['product__ProductName']: f"{item['UnblendedCost__sum']:.2f}"
             for item in items
         }
 
@@ -24,23 +25,34 @@ class SummaryItem(View):
 
 
 class SummaryItemByDays(View):
+    def daysUseage(self, item):
+        rate = item.UsageAmount / (item.UsageEndDate.timestamp() - item.UsageStartDate.timestamp())
+        res = {}
+        sdate = item.UsageStartDate
+        edate = datetime.datetime.strptime(sdate.strftime(r'%Y%m%d %z'), r'%Y%m%d %z')
+        edate = edate + datetime.timedelta(days=1)
+        edate = min(edate, item.UsageEndDate)
+        while sdate < edate:
+            res[sdate.strftime(r'%Y/%m/%d')] = rate * (edate.timestamp() - sdate.timestamp())
+            sdate += datetime.timedelta(days=1)
+            edate += datetime.timedelta(days=1)
+            edate = min(edate, item.UsageEndDate)
+
+        return res
+
     def get(self, request, usageaccountid):
         items = models.LineItem.objects
         items = items.select_related('product')
         items = items.filter(UsageAccountId=usageaccountid)
         items = items.order_by('product')
 
-        res = {}
+        results = {}
         for product, its in groupby(items, key=lambda x: x.product):
-            res[product.ProductName] = {}
-            its = list(its)
-            sday = min(its, key=lambda x: x.UsageStartDate).UsageStartDate.date()
-            eday = max(its, key=lambda x: x.UsageEndDate).UsageEndDate.date()
+            its = [self.daysUseage(it) for it in its]
 
-            for i in range(0, (eday - sday).days+1):
-                mday = sday + datetime.timedelta(days=i)
-                today_its = filter(lambda x: x.UsageStartDate.date() <= mday <= x.UsageEndDate.date(), its)
-                today_its = map(lambda x: x.UsageAmount, today_its)
-                res[product.ProductName][mday.strftime(r'%Y/%m/%d')] = f'{sum(today_its):.2f}'
+            res = dict(sum([Counter(it) for it in its], Counter()))
+            res = {k: f'{v:.2f}' for k, v in res.items()}
 
-        return JsonResponse(res)
+            results[product.ProductName] = res
+
+        return JsonResponse(results)
