@@ -25,7 +25,7 @@ class SummaryItem(View):
 
 
 class SummaryItemByDays(View):
-    def daysUseage(self, item):
+    def dailyUseage(self, item):
         rate = item.UsageAmount / (item.UsageEndDate.timestamp() - item.UsageStartDate.timestamp())
         res = {}
         sdate = item.UsageStartDate
@@ -34,7 +34,7 @@ class SummaryItemByDays(View):
         edate = min(edate, item.UsageEndDate)
         while sdate < edate:
             res[sdate.strftime(r'%Y/%m/%d')] = rate * (edate.timestamp() - sdate.timestamp())
-            sdate += datetime.timedelta(days=1)
+            sdate = edate
             edate += datetime.timedelta(days=1)
             edate = min(edate, item.UsageEndDate)
 
@@ -44,15 +44,22 @@ class SummaryItemByDays(View):
         items = models.LineItem.objects
         items = items.select_related('product')
         items = items.filter(UsageAccountId=usageaccountid)
-        items = items.order_by('product')
 
         results = {}
-        for product, its in groupby(items, key=lambda x: x.product):
-            its = [self.daysUseage(it) for it in its]
+        for item in items:
+            product = results.get(item.product.ProductName)
+            if not product:
+                results[item.product.ProductName] = product = {}
 
-            res = dict(sum([Counter(it) for it in its], Counter()))
-            res = {k: f'{v:.2f}' for k, v in res.items()}
+            for dt, value in self.dailyUseage(item).items():
+                product[dt] = product.get(dt, 0) + value
 
-            results[product.ProductName] = res
+        results = {
+            pname: {
+                dt: f'{product[dt]:.2f}'
+                for dt in sorted(product.keys())
+            }
+            for pname, product in results.items()
+        }
 
         return JsonResponse(results)
