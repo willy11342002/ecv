@@ -10,6 +10,8 @@ class Bill(models.Model):
     PayerAccountId = models.PositiveIntegerField()
     BillingPeriodStartDate = models.DateField()
 
+    def __str__(self):
+        return f'{self.InvoiceId}'
 
 class Product(models.Model):
     ProductName = models.CharField(max_length=128)
@@ -24,6 +26,9 @@ class Product(models.Model):
     operatingSystem = models.CharField(max_length=8, null=True, blank=True)
     region = models.CharField(max_length=32, null=True, blank=True)
     tenancy = models.CharField(max_length=8, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.ProductName}'
 
 
 class LineItem(models.Model):
@@ -45,6 +50,8 @@ class LineItem(models.Model):
     UnblendedCost = models.FloatField()
     LineItemDescription = models.CharField(max_length=512)
 
+    def __str__(self):
+        return f'{self.bill} ({self.UsageAccountId}) {self.LineItemType}'
 
 
 
