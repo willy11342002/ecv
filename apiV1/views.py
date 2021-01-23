@@ -2,8 +2,9 @@ from django.db.models import Count, Avg, Sum, Min, Max, Q
 from django.shortcuts import HttpResponse
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.views import View
+from django.http import Http404
 from collections import Counter
+from django.views import View
 from itertools import groupby
 from . import models
 import datetime
@@ -20,6 +21,8 @@ class SummaryItem(View):
             item['product__ProductName']: f"{item['UnblendedCost__sum']:.2f}"
             for item in items
         }
+        if not items:
+            raise Http404
 
         return JsonResponse(items)
 
@@ -44,6 +47,8 @@ class SummaryItemByDays(View):
         items = models.LineItem.objects
         items = items.select_related('product')
         items = items.filter(UsageAccountId=usageaccountid)
+        if not items:
+            raise Http404
 
         results = {}
         for item in items:
