@@ -5,6 +5,6 @@ from . import views
 
 
 urlpatterns = [
-    re_path(r'^lineitem/summary/(?P<usageaccountid>\d+)/?$', views.SummaryItem.as_view()),
-    re_path(r'^lineitem/summary/day/(?P<usageaccountid>\d+)/?$', views.SummaryItemByDays.as_view()),
+    re_path(r'^lineitem/(?P<usageaccountid>\d+)/products/summary/unblendedcost/?$', views.SummaryItem.as_view()),
+    re_path(r'^lineitem/(?P<usageaccountid>\d+)/products/summary/daily/usageamount/?$', views.SummaryItemByDays.as_view()),
 ]
