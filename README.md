@@ -42,18 +42,18 @@
 
 # API Design
 **Sum Of UnblendedCost By UsageAccountId**
-* **URL**
-[/apiv1/lineitem/:usageaccountid/products/summary/unblendedcost](https://ascendant-chain-296306.uc.r.appspot.com/apiv1/lineitem/147878817734/products/summary/unblendedcost)
+* **URL**  
+  [/apiv1/lineitem/:usageaccountid/products/summary/unblendedcost](https://ascendant-chain-296306.uc.r.appspot.com/apiv1/lineitem/147878817734/products/summary/unblendedcost)
 
-* **Method**
-GET
+* **Method**  
+  GET
 
-* **URL Params**
-**Required:**
-usageaccountid=[int]
+* **URL Params**  
+  **Required:**  
+  usageaccountid=[int]
 
-* **Data Params**
-None
+* **Data Params**  
+  None
 
 * **Success Response**
   * **Code:** 200
@@ -64,18 +64,18 @@ None
   * **Content:** 
 
 **Daily Sum Of UsageAmount By UsageAccountId**
-* **URL**
-[/apiv1/lineitem/:usageaccountid/products/summary/daily/usageamount](https://ascendant-chain-296306.uc.r.appspot.com/apiv1/lineitem/147878817734/products/summary/daily/usageamount)
+* **URL**  
+  [/apiv1/lineitem/:usageaccountid/products/summary/daily/usageamount](https://ascendant-chain-296306.uc.r.appspot.com/apiv1/lineitem/147878817734/products/summary/daily/usageamount)
 
-* **Method**
-GET
+* **Method**  
+  GET
 
-* **URL Params**
-**Required:**
-usageaccountid=[int]
+* **URL Params**  
+  **Required:**  
+  usageaccountid=[int]
 
-* **Data Params**
-None
+* **Data Params**  
+  None
 
 * **Success Response**
   * **Code:** 200
